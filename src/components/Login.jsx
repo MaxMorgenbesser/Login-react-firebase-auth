@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { initializeApp } from "firebase/app";
-import {createUserWithEmailAndPassword, getAuth} from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword,GoogleAuthProvider, signInWithPopup} from 'firebase/auth'
 
 
 const firebaseConfig = {
@@ -12,9 +12,43 @@ const firebaseConfig = {
   appId: "1:257988821655:web:84d4fe607ae940278f1fd2",
 };
 
+
+
+
+
+
 const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+const connectAuth = () =>{
+    const app = initializeApp(firebaseConfig);
+    //if all okay then set isLoggedIn to true
+    return getAuth(app)
+}
+const handleGoogleLogin = async () => {
+    const auth = await connectAuth()
+    const provider = new GoogleAuthProvider()
+    const user = await signInWithPopup(auth,provider)
+    .catch(err => alert(err))
+    if (user){
+        console.log(user.user)
+        setIsLoggedIn(true)
+    }
+}
+
+const handleLogin = async () =>{
+    const auth = await connectAuth()
+    const user = await signInWithEmailAndPassword(auth,email,password)
+   .catch(err=>alert(err))
+    if (user){ 
+        console.log(user.user)
+        setIsLoggedIn(true)}
+}
+
+
+
+
   const handleSignUp = async () => {
     //send email and password to firebase auth
     const app = initializeApp(firebaseConfig);
@@ -53,8 +87,12 @@ const user = await createUserWithEmailAndPassword(auth,email,password)
         />
       </label>
       <br />
+      <button onClick={handleLogin}>Login</button>&nbsp;
       <button onClick={handleSignUp}>Sign Up</button>
+      <br />
+      <button onClick={handleGoogleLogin}>Sign in with google</button>
     </form>
+
   );
 };
 
